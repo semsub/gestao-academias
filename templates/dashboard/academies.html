@@ -1,0 +1,85 @@
+{% extends "dashboard/_layout.html" %}
+{% block content %}
+<div class="space-y-6">
+  <div>
+    <h2 class="text-2xl font-bold text-slate-800">Academias</h2>
+    <p class="text-slate-600">Gerencie as academias clientes e seus planos.</p>
+  </div>
+
+  <details class="bg-white rounded-xl shadow">
+    <summary class="cursor-pointer p-4 font-semibold text-slate-800 hover:bg-slate-50">+ Cadastrar nova academia</summary>
+    <form method="POST" action="{{ url_for('academies_create') }}" class="p-6 grid gap-3 sm:grid-cols-2 border-t border-slate-200">
+      <div><label class="block text-sm font-medium text-slate-700 mb-1">Nome*</label>
+        <input name="name" required class="w-full rounded-lg border border-slate-300 px-3 py-2"></div>
+      <div><label class="block text-sm font-medium text-slate-700 mb-1">CNPJ</label>
+        <input name="cnpj" class="w-full rounded-lg border border-slate-300 px-3 py-2"></div>
+      <div><label class="block text-sm font-medium text-slate-700 mb-1">Telefone</label>
+        <input name="phone" class="w-full rounded-lg border border-slate-300 px-3 py-2"></div>
+      <div><label class="block text-sm font-medium text-slate-700 mb-1">E-mail</label>
+        <input type="email" name="email" class="w-full rounded-lg border border-slate-300 px-3 py-2"></div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">Plano*</label>
+        <select name="plan_type" class="w-full rounded-lg border border-slate-300 px-3 py-2">
+          {% for p in plans %}
+          <option value="{{ p.name }}">{{ p.name }} — {% if p.member_limit is none %}ilimitado{% else %}até {{ p.member_limit }}{% endif %} membros (R$ {{ '%.2f'|format(p.price) }})</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="sm:col-span-2 mt-2 pt-3 border-t border-slate-200">
+        <p class="text-sm font-semibold text-slate-700">Usuário Admin da Academia (opcional)</p>
+      </div>
+      <div><label class="block text-sm font-medium text-slate-700 mb-1">Nome do admin</label>
+        <input name="admin_name" class="w-full rounded-lg border border-slate-300 px-3 py-2"></div>
+      <div><label class="block text-sm font-medium text-slate-700 mb-1">Login do admin</label>
+        <input name="admin_login" class="w-full rounded-lg border border-slate-300 px-3 py-2"></div>
+      <div><label class="block text-sm font-medium text-slate-700 mb-1">Senha do admin</label>
+        <input type="password" name="admin_password" class="w-full rounded-lg border border-slate-300 px-3 py-2"></div>
+      <div class="sm:col-span-2 flex justify-end">
+        <button type="submit" class="rounded-lg bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 text-sm font-semibold">Salvar</button>
+      </div>
+    </form>
+  </details>
+
+  <div class="bg-white rounded-xl shadow overflow-x-auto">
+    <table class="w-full text-sm min-w-[700px]">
+      <thead class="bg-slate-100 text-slate-700">
+        <tr>
+          <th class="text-left px-4 py-3">Nome</th>
+          <th class="text-left px-4 py-3">CNPJ</th>
+          <th class="text-left px-4 py-3">Plano</th>
+          <th class="text-left px-4 py-3">Alunos</th>
+          <th class="text-left px-4 py-3">Admin</th>
+          <th class="text-right px-4 py-3">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% if not academies %}
+        <tr><td colspan="6" class="px-4 py-8 text-center text-slate-500">Nenhuma academia cadastrada.</td></tr>
+      {% endif %}
+      {% for a in academies %}
+        {% set used = count_map.get(a.id, 0) %}
+        {% set p = none %}
+        {% for pp in plans %}{% if pp.name == a.plan_type %}{% set p = pp %}{% endif %}{% endfor %}
+        {% set limit = p.member_limit if p else a.member_limit %}
+        {% set full = limit is not none and used >= limit %}
+        <tr class="border-t border-slate-200">
+          <td class="px-4 py-3 font-medium">{{ a.name }}</td>
+          <td class="px-4 py-3 text-slate-600">{{ a.cnpj or '—' }}</td>
+          <td class="px-4 py-3"><span class="inline-flex rounded-full bg-blue-100 text-blue-800 px-2 py-0.5 text-xs font-semibold">{{ a.plan_type }}</span></td>
+          <td class="px-4 py-3 {% if full %}text-red-600 font-semibold{% endif %}">{{ used }} / {% if limit is none %}∞{% else %}{{ limit }}{% endif %}</td>
+          <td class="px-4 py-3 text-xs text-slate-600">
+            {% set admins = admin_map.get(a.id, []) %}
+            {% if admins %}{{ admins|map(attribute='login')|join(', ') }}{% else %}—{% endif %}
+          </td>
+          <td class="px-4 py-3 text-right">
+            <form method="POST" action="{{ url_for('academies_delete', academy_id=a.id) }}" onsubmit="return confirm('Excluir academia {{ a.name }} e todos os dados associados?');" class="inline">
+              <button type="submit" class="text-red-600 hover:text-red-800 text-sm font-medium">Excluir</button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

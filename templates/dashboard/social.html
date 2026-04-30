@@ -1,0 +1,55 @@
+{% extends "dashboard/_layout.html" %}
+{% block content %}
+<div class="space-y-6">
+  <div>
+    <h2 class="text-2xl font-bold text-slate-800">Módulo Social</h2>
+    <p class="text-slate-600">Solicitações de bolsa para alunos sociais. Aprovar ou rejeitar.</p>
+  </div>
+
+  <div class="bg-white rounded-xl shadow overflow-x-auto">
+    <table class="w-full text-sm min-w-[700px]">
+      <thead class="bg-slate-100 text-slate-700">
+        <tr>
+          <th class="text-left px-4 py-3">Aluno</th>
+          <th class="text-left px-4 py-3">Renda familiar</th>
+          <th class="text-left px-4 py-3">Dependentes</th>
+          <th class="text-left px-4 py-3">Status</th>
+          <th class="text-right px-4 py-3">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if not items %}<tr><td colspan="5" class="px-4 py-8 text-center text-slate-500">Nenhuma solicitação social.</td></tr>{% endif %}
+        {% for r in items %}
+        <tr class="border-t border-slate-200">
+          <td class="px-4 py-3 font-medium">{{ r.student_name }}</td>
+          <td class="px-4 py-3 text-slate-600">{% if r.family_income %}R$ {{ '%.2f'|format(r.family_income) }}{% else %}—{% endif %}</td>
+          <td class="px-4 py-3 text-slate-600">{{ r.dependents if r.dependents is not none else '—' }}</td>
+          <td class="px-4 py-3">
+            {% if r.approved %}<span class="rounded-full bg-emerald-100 text-emerald-800 px-2 py-0.5 text-xs font-semibold">Aprovado</span>
+            {% else %}<span class="rounded-full bg-amber-100 text-amber-800 px-2 py-0.5 text-xs font-semibold">Pendente</span>{% endif %}
+          </td>
+          <td class="px-4 py-3 text-right">
+            <details class="inline-block text-left">
+              <summary class="cursor-pointer text-blue-700 hover:text-blue-900 text-sm font-medium">Avaliar</summary>
+              <form method="POST" action="{{ url_for('social_update', sid=r.id) }}" class="absolute right-6 mt-2 z-10 bg-white rounded-lg shadow-lg p-3 w-72 space-y-2">
+                <input type="number" step="0.01" name="family_income" placeholder="Renda familiar" value="{{ r.family_income or '' }}" class="w-full rounded border border-slate-300 px-2 py-1 text-sm">
+                <input type="number" name="dependents" placeholder="Dependentes" value="{{ r.dependents if r.dependents is not none else '' }}" class="w-full rounded border border-slate-300 px-2 py-1 text-sm">
+                <textarea name="notes" placeholder="Observações" rows="2" class="w-full rounded border border-slate-300 px-2 py-1 text-sm">{{ r.notes or '' }}</textarea>
+                <div class="flex gap-2 justify-end">
+                  <button type="submit" name="action" value="update" class="text-xs bg-slate-200 hover:bg-slate-300 px-2 py-1 rounded">Salvar</button>
+                  {% if not r.approved %}
+                  <button type="submit" name="action" value="approve" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded">Aprovar</button>
+                  {% else %}
+                  <button type="submit" name="action" value="reject" class="text-xs bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded">Revogar</button>
+                  {% endif %}
+                </div>
+              </form>
+            </details>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

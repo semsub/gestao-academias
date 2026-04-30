@@ -1,0 +1,76 @@
+{% extends "dashboard/_layout.html" %}
+{% block content %}
+<div class="space-y-6">
+  <div>
+    <h2 class="text-2xl font-bold text-slate-800">Turmas</h2>
+    <p class="text-slate-600">Cadastro de turmas, modalidades e horários.</p>
+  </div>
+
+  {% if session.get('role') != 'instructor' %}
+  <details class="bg-white rounded-xl shadow">
+    <summary class="cursor-pointer p-4 font-semibold text-slate-800 hover:bg-slate-50">+ Cadastrar turma</summary>
+    <form method="POST" action="{{ url_for('classes_create') }}" class="p-6 grid gap-3 sm:grid-cols-2 border-t border-slate-200">
+      <div><label class="block text-sm font-medium text-slate-700 mb-1">Nome da turma*</label>
+        <input name="name" required class="w-full rounded-lg border border-slate-300 px-3 py-2"></div>
+      <div><label class="block text-sm font-medium text-slate-700 mb-1">Modalidade</label>
+        <input name="modality" placeholder="Jiu-Jitsu, Boxe, Karatê..." class="w-full rounded-lg border border-slate-300 px-3 py-2"></div>
+      <div><label class="block text-sm font-medium text-slate-700 mb-1">Horário</label>
+        <input name="schedule" placeholder="Seg/Qua/Sex 19h às 20h" class="w-full rounded-lg border border-slate-300 px-3 py-2"></div>
+      {% if is_super %}
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">Academia*</label>
+        <select name="academy_id" required class="w-full rounded-lg border border-slate-300 px-3 py-2">
+          <option value="">Selecione...</option>
+          {% for a in academies %}<option value="{{ a.id }}">{{ a.name }}</option>{% endfor %}
+        </select>
+      </div>
+      {% endif %}
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">Professor</label>
+        <select name="instructor_id" class="w-full rounded-lg border border-slate-300 px-3 py-2">
+          <option value="">— sem professor —</option>
+          {% for i in instructors %}<option value="{{ i.id }}">{{ i.name }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="sm:col-span-2 flex justify-end">
+        <button type="submit" class="rounded-lg bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 text-sm font-semibold">Salvar</button>
+      </div>
+    </form>
+  </details>
+  {% endif %}
+
+  <div class="bg-white rounded-xl shadow overflow-x-auto">
+    <table class="w-full text-sm min-w-[700px]">
+      <thead class="bg-slate-100 text-slate-700">
+        <tr>
+          <th class="text-left px-4 py-3">Turma</th>
+          <th class="text-left px-4 py-3">Modalidade</th>
+          <th class="text-left px-4 py-3">Horário</th>
+          <th class="text-left px-4 py-3">Professor</th>
+          {% if is_super %}<th class="text-left px-4 py-3">Academia</th>{% endif %}
+          <th class="text-right px-4 py-3">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if not classes %}<tr><td colspan="6" class="px-4 py-8 text-center text-slate-500">Nenhuma turma cadastrada.</td></tr>{% endif %}
+        {% for c in classes %}
+        <tr class="border-t border-slate-200">
+          <td class="px-4 py-3 font-medium">{{ c.name }}</td>
+          <td class="px-4 py-3 text-slate-600">{{ c.modality or '—' }}</td>
+          <td class="px-4 py-3 text-slate-600">{{ c.schedule or '—' }}</td>
+          <td class="px-4 py-3 text-slate-600">{{ instructor_map[c.instructor_id].name if c.instructor_id in instructor_map else '—' }}</td>
+          {% if is_super %}<td class="px-4 py-3 text-slate-600">{{ academy_map[c.academy_id].name if c.academy_id in academy_map else '—' }}</td>{% endif %}
+          <td class="px-4 py-3 text-right">
+            {% if session.get('role') != 'instructor' %}
+            <form method="POST" action="{{ url_for('classes_delete', cid=c.id) }}" onsubmit="return confirm('Excluir turma?');" class="inline">
+              <button type="submit" class="text-red-600 hover:text-red-800 text-sm font-medium">Excluir</button>
+            </form>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

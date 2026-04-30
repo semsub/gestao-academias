@@ -1,0 +1,63 @@
+{% extends "dashboard/_layout.html" %}
+{% block content %}
+<div class="space-y-6">
+  <div>
+    <h2 class="text-2xl font-bold text-slate-800">Professores</h2>
+    <p class="text-slate-600">Gerencie os professores e suas especialidades.</p>
+  </div>
+
+  <details class="bg-white rounded-xl shadow">
+    <summary class="cursor-pointer p-4 font-semibold text-slate-800 hover:bg-slate-50">+ Cadastrar professor</summary>
+    <form method="POST" action="{{ url_for('instructors_create') }}" class="p-6 grid gap-3 sm:grid-cols-2 border-t border-slate-200">
+      <div><label class="block text-sm font-medium text-slate-700 mb-1">Nome*</label>
+        <input name="name" required class="w-full rounded-lg border border-slate-300 px-3 py-2"></div>
+      <div><label class="block text-sm font-medium text-slate-700 mb-1">Especialidade</label>
+        <input name="specialty" placeholder="Jiu-Jitsu, Muay Thai..." class="w-full rounded-lg border border-slate-300 px-3 py-2"></div>
+      <div><label class="block text-sm font-medium text-slate-700 mb-1">Telefone</label>
+        <input name="phone" class="w-full rounded-lg border border-slate-300 px-3 py-2"></div>
+      {% if is_super %}
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">Academia*</label>
+        <select name="academy_id" required class="w-full rounded-lg border border-slate-300 px-3 py-2">
+          <option value="">Selecione...</option>
+          {% for a in academies %}<option value="{{ a.id }}">{{ a.name }}</option>{% endfor %}
+        </select>
+      </div>
+      {% endif %}
+      <div class="sm:col-span-2 flex justify-end">
+        <button type="submit" class="rounded-lg bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 text-sm font-semibold">Salvar</button>
+      </div>
+    </form>
+  </details>
+
+  <div class="bg-white rounded-xl shadow overflow-x-auto">
+    <table class="w-full text-sm min-w-[600px]">
+      <thead class="bg-slate-100 text-slate-700">
+        <tr>
+          <th class="text-left px-4 py-3">Nome</th>
+          <th class="text-left px-4 py-3">Especialidade</th>
+          <th class="text-left px-4 py-3">Telefone</th>
+          {% if is_super %}<th class="text-left px-4 py-3">Academia</th>{% endif %}
+          <th class="text-right px-4 py-3">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if not instructors %}<tr><td colspan="5" class="px-4 py-8 text-center text-slate-500">Nenhum professor cadastrado.</td></tr>{% endif %}
+        {% for i in instructors %}
+        <tr class="border-t border-slate-200">
+          <td class="px-4 py-3 font-medium">{{ i.name }}</td>
+          <td class="px-4 py-3 text-slate-600">{{ i.specialty or '—' }}</td>
+          <td class="px-4 py-3 text-slate-600">{{ i.phone or '—' }}</td>
+          {% if is_super %}<td class="px-4 py-3 text-slate-600">{{ academy_map[i.academy_id].name if i.academy_id in academy_map else '—' }}</td>{% endif %}
+          <td class="px-4 py-3 text-right">
+            <form method="POST" action="{{ url_for('instructors_delete', iid=i.id) }}" onsubmit="return confirm('Excluir professor?');" class="inline">
+              <button type="submit" class="text-red-600 hover:text-red-800 text-sm font-medium">Excluir</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

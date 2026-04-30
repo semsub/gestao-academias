@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1E88E5"/>
+      <stop offset="100%" stop-color="#0D47A1"/>
+    </linearGradient>
+    <linearGradient id="og" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFB347"/>
+      <stop offset="100%" stop-color="#D44E00"/>
+    </linearGradient>
+    <linearGradient id="bs" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#7FCBFF"/>
+      <stop offset="100%" stop-color="#2196F3"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="96" fill="url(#bg)"/>
+  <g transform="translate(106 60)">
+    <path d="M150 0 L300 50 L300 230 Q300 350 150 410 Q0 350 0 230 L0 50 Z"
+          fill="url(#bs)" stroke="#fff" stroke-width="14"/>
+    <path d="M150 28 L272 68 L272 222 Q272 330 150 380 Q28 330 28 222 L28 68 Z"
+          fill="url(#bg)"/>
+    <!-- Kimono V -->
+    <path d="M70 90 L150 175 L230 90 L210 80 L150 145 L90 80 Z" fill="#fff"/>
+    <!-- Fists -->
+    <g transform="translate(150 250)">
+      <ellipse cx="-50" cy="0" rx="50" ry="40" fill="url(#og)" stroke="#fff" stroke-width="6"/>
+      <ellipse cx="50" cy="0" rx="50" ry="40" fill="url(#og)" stroke="#fff" stroke-width="6"/>
+      <line x1="-70" y1="-18" x2="-70" y2="18" stroke="#7a2a00" stroke-width="5"/>
+      <line x1="-50" y1="-22" x2="-50" y2="22" stroke="#7a2a00" stroke-width="5"/>
+      <line x1="-30" y1="-18" x2="-30" y2="18" stroke="#7a2a00" stroke-width="5"/>
+      <line x1="30" y1="-18" x2="30" y2="18" stroke="#7a2a00" stroke-width="5"/>
+      <line x1="50" y1="-22" x2="50" y2="22" stroke="#7a2a00" stroke-width="5"/>
+      <line x1="70" y1="-18" x2="70" y2="18" stroke="#7a2a00" stroke-width="5"/>
+    </g>
+  </g>
+</svg>

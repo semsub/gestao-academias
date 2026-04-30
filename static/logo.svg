@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 360" width="800" height="360">
+  <defs>
+    <linearGradient id="orangeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFB347"/>
+      <stop offset="50%" stop-color="#FF7A1A"/>
+      <stop offset="100%" stop-color="#D44E00"/>
+    </linearGradient>
+    <linearGradient id="blueGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#5BB7FF"/>
+      <stop offset="50%" stop-color="#1E88E5"/>
+      <stop offset="100%" stop-color="#0D47A1"/>
+    </linearGradient>
+    <linearGradient id="blueGradLight" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#7FCBFF"/>
+      <stop offset="100%" stop-color="#2196F3"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#000" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+
+  <!-- Shield -->
+  <g filter="url(#shadow)" transform="translate(330 30)">
+    <path d="M70 0 L140 25 L140 110 Q140 165 70 195 Q0 165 0 110 L0 25 Z"
+          fill="url(#blueGradLight)" stroke="#fff" stroke-width="6"/>
+    <path d="M70 12 L128 32 L128 108 Q128 155 70 180 Q12 155 12 108 L12 32 Z"
+          fill="url(#blueGrad)"/>
+    <!-- Kimono collar V -->
+    <path d="M40 35 L70 75 L100 35 L92 32 L70 60 L48 32 Z" fill="#fff" opacity="0.9"/>
+    <!-- Two fists bumping -->
+    <g transform="translate(70 115)">
+      <!-- left fist -->
+      <ellipse cx="-22" cy="0" rx="22" ry="18" fill="url(#orangeGrad)" stroke="#fff" stroke-width="2"/>
+      <!-- right fist -->
+      <ellipse cx="22" cy="0" rx="22" ry="18" fill="url(#orangeGrad)" stroke="#fff" stroke-width="2"/>
+      <!-- knuckles lines -->
+      <line x1="-30" y1="-8" x2="-30" y2="8" stroke="#7a2a00" stroke-width="2"/>
+      <line x1="-22" y1="-10" x2="-22" y2="10" stroke="#7a2a00" stroke-width="2"/>
+      <line x1="-14" y1="-8" x2="-14" y2="8" stroke="#7a2a00" stroke-width="2"/>
+      <line x1="14" y1="-8" x2="14" y2="8" stroke="#7a2a00" stroke-width="2"/>
+      <line x1="22" y1="-10" x2="22" y2="10" stroke="#7a2a00" stroke-width="2"/>
+      <line x1="30" y1="-8" x2="30" y2="8" stroke="#7a2a00" stroke-width="2"/>
+    </g>
+  </g>
+
+  <!-- Top text "SISTEMA DE GESTÃO" -->
+  <g filter="url(#shadow)">
+    <text x="400" y="195" text-anchor="middle"
+          font-family="Impact, 'Arial Black', sans-serif" font-size="72" font-weight="900"
+          fill="url(#orangeGrad)" stroke="#fff" stroke-width="4" paint-order="stroke">
+      SISTEMA DE GESTÃO
+    </text>
+  </g>
+
+  <!-- Bottom blue bar -->
+  <g filter="url(#shadow)">
+    <rect x="60" y="220" width="680" height="60" rx="30" fill="url(#blueGrad)" stroke="#fff" stroke-width="4"/>
+    <text x="400" y="262" text-anchor="middle"
+          font-family="Impact, 'Arial Black', sans-serif" font-size="30" font-weight="900"
+          fill="#fff" letter-spacing="2">
+      DE ACADEMIA DE ARTES MARCIAIS
+    </text>
+  </g>
+</svg>
