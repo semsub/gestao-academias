@@ -1,13 +1,18 @@
 {% extends "base.html" %}
 {% block body %}
 <div class="flex-1 flex bg-slate-100">
-  <aside class="hidden lg:flex w-64 bg-gradient-to-b from-blue-900 via-blue-800 to-blue-900 text-white flex-col">
+  <!-- Mobile menu overlay -->
+  <div id="mobile-overlay" class="fixed inset-0 bg-black/50 z-30 hidden lg:hidden" onclick="toggleSidebar()"></div>
+
+  <!-- Sidebar -->
+  <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 z-40 w-64 bg-gradient-to-b from-blue-900 via-blue-800 to-blue-900 text-white flex flex-col transform -translate-x-full lg:translate-x-0 transition-transform duration-200">
     <div class="p-4 border-b border-blue-700/50 flex items-center gap-3">
       <img src="{{ url_for('static', filename='icon.svg') }}" class="w-10 h-10" alt="JA">
       <div>
         <p class="font-bold text-sm leading-tight">Sistema de Gestão</p>
         <p class="text-xs text-blue-200 leading-tight">Artes Marciais</p>
       </div>
+      <button onclick="toggleSidebar()" class="lg:hidden ml-auto text-white text-xl">✕</button>
     </div>
     <nav class="flex-1 overflow-y-auto p-3 space-y-1">
       {% set role = session.get('role') %}
@@ -29,17 +34,25 @@
       {% if role in ['super_admin', 'admin'] %}{{ nav('financial_list', '💰', 'Financeiro') }}{% endif %}
       {% if role in ['super_admin', 'admin'] %}{{ nav('social_list', '🤝', 'Social') }}{% endif %}
       {% if role in ['super_admin', 'admin'] %}{{ nav('reports_view', '📈', 'Relatórios') }}{% endif %}
+      {% if role in ['super_admin', 'admin'] %}{{ nav('users_list', '👤', 'Usuários') }}{% endif %}
+      {% if role == 'admin' %}{{ nav('academy_profile', '🏫', 'Perfil da Academia') }}{% endif %}
     </nav>
-    <div class="p-3 text-xs text-blue-300 border-t border-blue-700/50">v1.0 • Multi-tenant SaaS</div>
+    <div class="p-3 text-xs text-blue-300 border-t border-blue-700/50">
+      v1.0 • Multi-tenant SaaS
+    </div>
   </aside>
 
   <div class="flex-1 flex flex-col min-w-0">
-    <header class="bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between">
-      <h1 class="text-lg font-semibold text-slate-800">
-        {% if session.get('role') == 'super_admin' %}Painel Super Admin{% else %}Painel da Academia{% endif %}
-      </h1>
-      <div class="flex items-center gap-4">
-        <div class="text-right text-sm">
+    <!-- Header -->
+    <header class="bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <button onclick="toggleSidebar()" class="lg:hidden text-slate-600 text-xl p-1">☰</button>
+        <h1 class="text-lg font-semibold text-slate-800">
+          {% if session.get('role') == 'super_admin' %}Painel Super Admin{% else %}Painel da Academia{% endif %}
+        </h1>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="text-right text-sm hidden sm:block">
           <p class="font-medium text-slate-800">{{ session.get('name') }}</p>
           <p class="text-slate-500 capitalize text-xs">{{ session.get('role', '').replace('_', ' ') }}</p>
         </div>
@@ -50,7 +63,9 @@
         </form>
       </div>
     </header>
-    <main class="flex-1 p-6 overflow-x-auto">
+
+    <!-- Main content -->
+    <main class="flex-1 p-4 lg:p-6 overflow-x-auto">
       {% with messages = get_flashed_messages(with_categories=true) %}
         {% for category, msg in messages %}
           <div class="mb-4 rounded-lg border p-3 text-sm
@@ -64,4 +79,19 @@
     </main>
   </div>
 </div>
+
+<script>
+function toggleSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('mobile-overlay');
+  const isOpen = !sidebar.classList.contains('-translate-x-full');
+  if (isOpen) {
+    sidebar.classList.add('-translate-x-full');
+    overlay.classList.add('hidden');
+  } else {
+    sidebar.classList.remove('-translate-x-full');
+    overlay.classList.remove('hidden');
+  }
+}
+</script>
 {% endblock %}

@@ -161,8 +161,8 @@ PLANS = [
     {
         "name": "Isento",
         "price": 0.00,
-        "member_limit": 10,
-        "description": "Plano cortesia (até 10 membros)",
+        "member_limit": None,
+        "description": "Plano cortesia — membros ilimitados",
     },
     {
         "name": "Plano JA",

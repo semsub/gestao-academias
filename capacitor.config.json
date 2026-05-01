@@ -2,9 +2,8 @@
   "appId": "br.com.junioraraujo.gestaoacademias",
   "appName": "JA Gestão Academias",
   "webDir": "static",
-  "bundledWebRuntime": false,
   "server": {
-    "url": "https://gestao-academias.onrender.com",
+    "url": "https://gestao-academias-ghna.onrender.com",
     "cleartext": false
   },
   "plugins": {

@@ -721,6 +721,136 @@ def register_routes(app: Flask):
             per_academy=per_academy,
         )
 
+    # =================================================================
+    # GERENCIAMENTO DE USUÁRIOS (admin e super_admin)
+    # =================================================================
+    @app.get("/users")
+    @role_required("super_admin", "admin")
+    def users_list():
+        is_super = session.get("role") == "super_admin"
+        academy_id = session.get("academy_id")
+
+        if is_super:
+            items = db.session.scalars(select(User).order_by(User.id)).all()
+            academies = db.session.scalars(select(Academy).order_by(Academy.name)).all()
+        else:
+            items = db.session.scalars(
+                select(User).where(User.academy_id == academy_id).order_by(User.id)
+            ).all()
+            academies = []
+
+        academy_map = {a.id: a for a in db.session.scalars(select(Academy)).all()}
+        return render_template(
+            "dashboard/users.html",
+            users=items, academies=academies, is_super=is_super,
+            academy_map=academy_map,
+        )
+
+    @app.post("/users")
+    @role_required("super_admin", "admin")
+    def users_create():
+        name = (request.form.get("name") or "").strip()
+        login = (request.form.get("login") or "").strip()
+        password = request.form.get("password") or ""
+        role = request.form.get("role") or "instructor"
+        is_super = session.get("role") == "super_admin"
+
+        if not name or not login or not password:
+            flash("Nome, login e senha são obrigatórios.", "error")
+            return redirect(url_for("users_list"))
+
+        exists = db.session.scalar(select(User).where(User.login == login))
+        if exists:
+            flash("Login já está em uso.", "error")
+            return redirect(url_for("users_list"))
+
+        if is_super:
+            academy_id = int(request.form.get("academy_id") or 0) or None
+        else:
+            academy_id = session.get("academy_id")
+
+        db.session.add(User(
+            name=name, login=login, email=request.form.get("email") or None,
+            password=hash_password(password), role=role, academy_id=academy_id,
+        ))
+        db.session.commit()
+        flash(f"Usuário '{name}' criado com sucesso.", "success")
+        return redirect(url_for("users_list"))
+
+    @app.post("/users/<int:uid>/password")
+    @role_required("super_admin", "admin")
+    def users_change_password(uid):
+        user = db.session.get(User, uid)
+        if not user:
+            flash("Usuário não encontrado.", "error")
+            return redirect(url_for("users_list"))
+
+        # Scope check
+        if session.get("role") != "super_admin":
+            if user.academy_id != session.get("academy_id"):
+                abort(403)
+
+        new_password = request.form.get("new_password") or ""
+        if len(new_password) < 4:
+            flash("Senha muito curta (mínimo 4 caracteres).", "error")
+            return redirect(url_for("users_list"))
+
+        user.password = hash_password(new_password)
+        db.session.commit()
+        flash(f"Senha de '{user.name}' alterada com sucesso.", "success")
+        return redirect(url_for("users_list"))
+
+    @app.post("/users/<int:uid>/delete")
+    @role_required("super_admin", "admin")
+    def users_delete(uid):
+        user = db.session.get(User, uid)
+        if not user:
+            return redirect(url_for("users_list"))
+        if session.get("role") != "super_admin":
+            if user.academy_id != session.get("academy_id"):
+                abort(403)
+        # Não permite excluir a si mesmo
+        if user.id == session.get("uid"):
+            flash("Não pode excluir seu próprio usuário.", "error")
+            return redirect(url_for("users_list"))
+        db.session.delete(user)
+        db.session.commit()
+        flash("Usuário excluído.", "success")
+        return redirect(url_for("users_list"))
+
+    # =================================================================
+    # PERFIL DA ACADEMIA (admin pode ver/alterar plano se super_admin)
+    # =================================================================
+    @app.get("/academy-profile")
+    @role_required("super_admin", "admin")
+    def academy_profile():
+        is_super = session.get("role") == "super_admin"
+        academy_id = session.get("academy_id")
+        if is_super:
+            flash("Super Admin usa a página Academias.", "info")
+            return redirect(url_for("academies_list"))
+        ac = db.session.get(Academy, academy_id)
+        if not ac:
+            flash("Academia não encontrada.", "error")
+            return redirect(url_for("dashboard"))
+        return render_template("dashboard/academy_profile.html", academy=ac, plans=PLANS)
+
+    @app.post("/academy-profile")
+    @role_required("admin")
+    def academy_profile_update():
+        academy_id = session.get("academy_id")
+        ac = db.session.get(Academy, academy_id)
+        if not ac:
+            flash("Academia não encontrada.", "error")
+            return redirect(url_for("dashboard"))
+        ac.name = (request.form.get("name") or ac.name).strip()
+        ac.cnpj = request.form.get("cnpj") or ac.cnpj
+        ac.phone = request.form.get("phone") or ac.phone
+        ac.email = request.form.get("email") or ac.email
+        db.session.commit()
+        flash("Dados da academia atualizados.", "success")
+        return redirect(url_for("academy_profile"))
+
 
 app = create_app()
 

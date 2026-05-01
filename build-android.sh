@@ -1,51 +1,53 @@
 #!/bin/bash
 # =============================================================================
-# BUILD DO APK NATIVO ANDROID - KALI LINUX
+# BUILD APK ANDROID
 # =============================================================================
 set -e
 
 echo "═══════════════════════════════════════════════════════════════"
-echo "  🥋 BUILD APK - Sistema de Gestão de Academias"
+echo "  📱 BUILD APK - Android"
+echo "  JA Gestão Academias"
 echo "═══════════════════════════════════════════════════════════════"
 
 if [ ! -f "app.py" ]; then
-    echo "❌ ERRO: Execute este script dentro da pasta python-app/"
+    echo "❌ ERRO: Execute na pasta python-app/"
     exit 1
 fi
 
-# === 1: Gerar ícones ===
+echo ""
+echo "🧹 Limpando build anterior..."
+rm -rf android android-res-temp
+
+echo ""
+echo "📱 Adicionando Android..."
+npx cap add android
+
+echo ""
 echo "🎨 Gerando ícones..."
 python3 generate_icons.py
 
-# === 2: Verificar ===
 echo ""
-echo "📱 Verificando..."
-
-if [ ! -f "capacitor.config.json" ]; then
-    echo "❌ capacitor.config.json não encontrado!"
-    echo "   Rode primeiro: bash fix-and-setup.sh"
-    exit 1
-fi
-
-if [ ! -f "static/index.html" ]; then
-    echo "❌ static/index.html não encontrado!"
-    exit 1
-fi
-
-# Se não existe plataforma Android, adiciona
-if [ ! -d "android" ]; then
-    echo "   Adicionando Android..."
-    npx cap add android
-fi
-
-# Copia ícones
+echo "📂 Copiando ícones..."
 if [ -d "android-res-temp" ]; then
-    echo "   Copiando ícones..."
-    cp -r android-res-temp/* android/app/src/main/res/ 2>/dev/null || true
+    for d in android-res-temp/mipmap-*; do
+        name=$(basename "$d")
+        if [ -d "$d" ]; then
+            mkdir -p "android/app/src/main/res/$name"
+            cp "$d"/* "android/app/src/main/res/$name/"
+            echo "   ✅ $name"
+        fi
+    done
+    for d in android-res-temp/drawable-*; do
+        name=$(basename "$d")
+        if [ -d "$d" ]; then
+            mkdir -p "android/app/src/main/res/$name"
+            cp "$d"/* "android/app/src/main/res/$name/"
+            echo "   ✅ $name"
+        fi
+    done
     rm -rf android-res-temp
 fi
 
-# === 3: Sync e Build ===
 echo ""
 echo "⚙️  Sincronizando..."
 npx cap sync android
@@ -60,6 +62,6 @@ echo "════════════════════════�
 echo "  ✅ APK GERADO!"
 echo "═══════════════════════════════════════════════════════════════"
 echo ""
-echo "📂 APK: android/app/build/outputs/apk/debug/app-debug.apk"
+echo "📂 APK Debug: android/app/build/outputs/apk/debug/app-debug.apk"
 echo "📲 Instalar: adb install android/app/build/outputs/apk/debug/app-debug.apk"
 echo ""

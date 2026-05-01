@@ -1,9 +1,7 @@
 #!/bin/bash
 # =============================================================================
 # SETUP COMPLETO PARA KALI LINUX
-# Resolve: externally-managed-environment (pip) e EACCES (npm)
 # =============================================================================
-
 set -e
 
 echo "═══════════════════════════════════════════════════════════════"
@@ -11,43 +9,72 @@ echo "  🥋 Setup - Sistema de Gestão de Academias"
 echo "  Kali Linux Edition"
 echo "═══════════════════════════════════════════════════════════════"
 
-# Detectar se estamos na pasta correta
 if [ ! -f "app.py" ]; then
     echo "❌ ERRO: Execute este script dentro da pasta python-app/"
-    echo "   cd python-app"
-    echo "   bash setup-kali.sh"
     exit 1
 fi
 
+# === PASSO 1: Python ===
 echo ""
 echo "📦 Passo 1/5: Instalando dependências Python..."
-echo "   (usando --break-system-packages para Kali)"
+pip install --break-system-packages -r requirements.txt 2>/dev/null || {
+    echo "   ⚠️  psycopg falhou, usando SQLite..."
+    pip install --break-system-packages -r requirements-dev.txt
+}
 
-pip install --break-system-packages -r requirements.txt
-
+# === PASSO 2: Node ===
 echo ""
-echo "📦 Passo 2/5: Instalando dependências Node.js (Capacitor)..."
-echo "   (instalação local, sem sudo necessário)"
-
+echo "📦 Passo 2/5: Instalando dependências Node.js..."
 npm install
 
+# === PASSO 3: Verificar index.html ===
 echo ""
-echo "🎨 Passo 3/5: Gerando ícones..."
+echo "🔍 Passo 3/5: Verificando arquivos..."
+if [ ! -f "static/index.html" ]; then
+    echo "❌ static/index.html não encontrado!"
+    echo "   Este arquivo é obrigatório para o Capacitor."
+    exit 1
+fi
+echo "   ✅ static/index.html encontrado"
+
+# === PASSO 4: Gerar ícones ===
+echo ""
+echo "🎨 Passo 4/5: Gerando ícones..."
 python3 generate_icons.py
 
+# === PASSO 5: Capacitor ===
 echo ""
-echo "🔧 Passo 4/5: Inicializando Capacitor Android..."
+echo "🔧 Passo 5/5: Configurando Capacitor Android..."
 
-# Se já existe android, remove para recriar limpo
+# Garante capacitor.config.json
+if [ ! -f "capacitor.config.json" ]; then
+    echo "❌ capacitor.config.json não encontrado!"
+    exit 1
+fi
+
+# Remove projeto Android antigo completamente
+if [ -d "android" ]; then
+    echo "   Removendo pasta android/ antiga..."
+    rm -rf android
+fi
 if [ -d "capacitor/android" ]; then
-    echo "   Removendo build anterior..."
+    echo "   Removendo capacitor/android antigo..."
     rm -rf capacitor/android
 fi
 
+# Adiciona plataforma Android
+echo "   Adicionando Android..."
 npx cap add android
 
-echo ""
-echo "⚙️  Passo 5/5: Sincronizando..."
+# Copia ícones gerados para o projeto Android
+if [ -d "android-res-temp" ]; then
+    echo "   Copiando ícones..."
+    cp -r android-res-temp/* android/app/src/main/res/ 2>/dev/null || true
+    rm -rf android-res-temp
+fi
+
+# Sync
+echo "   Sincronizando..."
 npx cap sync android
 
 echo ""
@@ -55,6 +82,6 @@ echo "════════════════════════�
 echo "  ✅ SETUP COMPLETO!"
 echo "═══════════════════════════════════════════════════════════════"
 echo ""
-echo "📱 Agora gere o APK com:"
-echo "   bash build-apk.sh"
+echo "📱 Gere o APK com: bash build-apk.sh"
+echo "🌐 Teste local: python3 app.py"
 echo ""

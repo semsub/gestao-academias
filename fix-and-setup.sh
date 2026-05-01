@@ -1,29 +1,46 @@
 #!/bin/bash
+# =============================================================================
+# SCRIPT ÚNICO DE CORREÇÃO + SETUP
+# Limpa tudo, recria config, gera ícones em pasta temporária, cria Android
+# =============================================================================
 set -e
+
 echo "═══════════════════════════════════════════════════════════════"
 echo "  🔧 CORREÇÃO + SETUP"
+echo "  Sistema de Gestão de Academias"
 echo "═══════════════════════════════════════════════════════════════"
 
-# 1. LIMPAR TUDO
+if [ ! -f "app.py" ]; then
+    echo "❌ ERRO: Execute este script dentro da pasta python-app/"
+    exit 1
+fi
+
+# === 1. LIMPEZA TOTAL ===
 echo ""
-echo "🧹 Limpando..."
-rm -rf android capacitor/android android-res-temp capacitor.config.json
+echo "🧹 Limpando tudo..."
+rm -rf android
+rm -rf capacitor/android
+rm -rf android-res-temp
+rm -f capacitor.config.json
 echo "   ✅ Limpo"
 
-# 2. PYTHON
+# === 2. PYTHON ===
 echo ""
-echo "📦 Python..."
-pip install --break-system-packages -r requirements.txt 2>/dev/null || pip install --break-system-packages -r requirements-dev.txt
+echo "📦 Instalando Python..."
+pip install --break-system-packages -r requirements.txt 2>/dev/null || {
+    echo "   ⚠️  psycopg falhou, usando SQLite..."
+    pip install --break-system-packages -r requirements-dev.txt
+}
 
-# 3. NODE
+# === 3. NODE ===
 echo ""
-echo "📦 Node..."
+echo "📦 Instalando Node.js..."
 npm install
 
-# 4. CAPACITOR CONFIG
+# === 4. CAPACITOR CONFIG ===
 echo ""
-echo "🔧 capacitor.config.json..."
-cat > capacitor.config.json << 'JSONEOF'
+echo "🔧 Criando capacitor.config.json..."
+cat > capacitor.config.json << 'EOF'
 {
   "appId": "br.com.junioraraujo.gestaoacademias",
   "appName": "JA Gestão Academias",
@@ -43,60 +60,60 @@ cat > capacitor.config.json << 'JSONEOF'
     }
   }
 }
-JSONEOF
-echo "   ✅ Config criado"
+EOF
+echo "   ✅ capacitor.config.json"
 
-# 5. STATIC/INDEX.HTML
+# === 5. STATIC/INDEX.HTML ===
 echo ""
-echo "🔍 static/index.html..."
+echo "🔍 Verificando static/index.html..."
 if [ ! -f "static/index.html" ]; then
-mkdir -p static
-cat > static/index.html << 'HTMLEOF'
+    mkdir -p static
+    cat > static/index.html << 'HTMLEOF'
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JA Gestão Academias</title>
-<style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-background: linear-gradient(135deg, #0D47A1, #1E88E5);
-min-height: 100vh; display: flex; align-items: center; justify-content: center;
-color: white; }
-.container { text-align: center; padding: 2rem; }
-.logo { width: 150px; height: 150px; margin-bottom: 1.5rem; }
-h1 { font-size: 1.8rem; margin-bottom: 0.5rem; }
-p { opacity: 0.9; margin-bottom: 2rem; }
-.loading { width: 48px; height: 48px; border: 4px solid rgba(255,255,255,0.3);
-border-top-color: #fff; border-radius: 50%; margin: 0 auto 1.5rem;
-animation: spin 1s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
-.btn { display: inline-block; background: #FF7A1A; color: white;
-padding: 12px 32px; border-radius: 8px; text-decoration: none;
-font-weight: 600; margin-top: 1rem; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JA Gestão Academias</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+           background: linear-gradient(135deg, #0D47A1, #1E88E5);
+           min-height: 100vh; display: flex; align-items: center; justify-content: center;
+           color: white; }
+    .container { text-align: center; padding: 2rem; }
+    .logo { width: 150px; height: 150px; margin-bottom: 1.5rem; }
+    h1 { font-size: 1.8rem; margin-bottom: 0.5rem; }
+    p { opacity: 0.9; margin-bottom: 2rem; }
+    .loading { width: 48px; height: 48px; border: 4px solid rgba(255,255,255,0.3);
+               border-top-color: #fff; border-radius: 50%; margin: 0 auto 1.5rem;
+               animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .btn { display: inline-block; background: #FF7A1A; color: white;
+           padding: 12px 32px; border-radius: 8px; text-decoration: none;
+           font-weight: 600; margin-top: 1rem; }
+  </style>
 </head>
 <body>
-<div class="container">
-<img src="icon.svg" alt="JA Gestão" class="logo">
-<div class="loading"></div>
-<h1>JA Gestão Academias</h1>
-<p>Carregando sistema...</p>
-<a href="https://gestao-academias.onrender.com" class="btn">Acessar Sistema</a>
-</div>
-<script>
-setTimeout(function() { window.location.replace('https://gestao-academias.onrender.com'); }, 500);
-</script>
+  <div class="container">
+    <img src="icon.svg" alt="JA Gestão" class="logo">
+    <div class="loading"></div>
+    <h1>JA Gestão Academias</h1>
+    <p>Carregando sistema...</p>
+    <a href="https://gestao-academias.onrender.com" class="btn">Acessar Sistema</a>
+  </div>
+  <script>
+    setTimeout(function() { window.location.replace('https://gestao-academias.onrender.com'); }, 500);
+  </script>
 </body>
 </html>
 HTMLEOF
-echo "   ✅ Criado"
+    echo "   ✅ static/index.html criado"
 else
-echo "   ✅ Já existe"
+    echo "   ✅ static/index.html já existe"
 fi
 
-# 6. SOBRESCREVER GENERATE_ICONS.PY
+# === 6. SOBRESCREVER GENERATE_ICONS.PY ===
 echo ""
 echo "🎨 Atualizando generate_icons.py..."
 cat > generate_icons.py << 'PYEOF'
@@ -266,6 +283,8 @@ def main():
     print("\n🖼️ Splash Screens:")
     generate_splash_screen(source if has_source else None)
     print("\n✅ Todos os ícones gerados!")
+    print(f"\n📂 Android resources: {ANDROID_RES_DIR}")
+    print(f"📂 PWA icons: {STATIC_ICONS_DIR}")
 
 if __name__ == "__main__":
     main()
@@ -274,12 +293,12 @@ PYEOF
 chmod +x generate_icons.py
 python3 generate_icons.py
 
-# 7. CAPACITOR ADD ANDROID
+# === 7. CAPACITOR ADD ANDROID ===
 echo ""
-echo "📱 Adicionando Android..."
+echo "📱 Adicionando plataforma Android..."
 npx cap add android
 
-# 8. COPIAR ÍCONES
+# === 8. COPIAR ÍCONES ===
 echo ""
 echo "🎨 Copiando ícones..."
 if [ -d "android-res-temp" ]; then
@@ -288,7 +307,7 @@ if [ -d "android-res-temp" ]; then
     echo "   ✅ Ícones copiados"
 fi
 
-# 9. SYNC
+# === 9. SYNC ===
 echo ""
 echo "⚙️  Sincronizando..."
 npx cap sync android
@@ -299,4 +318,5 @@ echo "  ✅ TUDO PRONTO!"
 echo "═══════════════════════════════════════════════════════════════"
 echo ""
 echo "📱 Gere o APK: cd android && ./gradlew assembleDebug"
+echo "📲 Instalar: adb install android/app/build/outputs/apk/debug/app-debug.apk"
 echo ""

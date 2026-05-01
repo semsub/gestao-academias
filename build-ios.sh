@@ -1,65 +1,61 @@
 #!/bin/bash
 # =============================================================================
-# BUILD DO APK NATIVO ANDROID - KALI LINUX
+# BUILD iOS - REQUER MAC + XCODE
 # =============================================================================
 set -e
 
 echo "═══════════════════════════════════════════════════════════════"
-echo "  🥋 BUILD APK - Sistema de Gestão de Academias"
+echo "  🍎 BUILD iOS"
+echo "  JA Gestão Academias"
 echo "═══════════════════════════════════════════════════════════════"
 
 if [ ! -f "app.py" ]; then
-    echo "❌ ERRO: Execute este script dentro da pasta python-app/"
+    echo "❌ ERRO: Execute na pasta python-app/"
     exit 1
 fi
 
-# === 1: Gerar ícones ===
+if [[ "$OSTYPE" != "darwin"* ]]; then
+    echo "❌ ERRO: Build iOS requer macOS com Xcode instalado."
+    echo "   Este sistema é: $OSTYPE"
+    exit 1
+fi
+
+echo ""
+echo "🧹 Limpando build anterior..."
+rm -rf ios
+
+echo ""
+echo "🍎 Adicionando iOS..."
+npx cap add ios
+
+echo ""
 echo "🎨 Gerando ícones..."
 python3 generate_icons.py
 
-# === 2: Verificar ===
 echo ""
-echo "📱 Verificando..."
-
-if [ ! -f "capacitor.config.json" ]; then
-    echo "❌ capacitor.config.json não encontrado!"
-    echo "   Rode primeiro: bash fix-and-setup.sh"
-    exit 1
-fi
-
-if [ ! -f "static/index.html" ]; then
-    echo "❌ static/index.html não encontrado!"
-    exit 1
-fi
-
-# Se não existe plataforma Android, adiciona
-if [ ! -d "android" ]; then
-    echo "   Adicionando Android..."
-    npx cap add android
-fi
-
-# Copia ícones
+echo "📂 Copiando ícones..."
+# iOS usa Assets.xcassets para ícones
 if [ -d "android-res-temp" ]; then
-    echo "   Copiando ícones..."
-    cp -r android-res-temp/* android/app/src/main/res/ 2>/dev/null || true
+    # Copiar o maior ícone para o iOS
+    cp android-res-temp/mipmap-xxxhdpi/ic_launcher.png ios/App/App/Assets.xcassets/AppIcon.appiconset/icon-1024.png 2>/dev/null || true
     rm -rf android-res-temp
 fi
 
-# === 3: Sync e Build ===
 echo ""
 echo "⚙️  Sincronizando..."
-npx cap sync android
-
-echo ""
-echo "🔨 Build APK Debug..."
-cd android
-./gradlew assembleDebug
+npx cap sync ios
 
 echo ""
 echo "═══════════════════════════════════════════════════════════════"
-echo "  ✅ APK GERADO!"
+echo "  ✅ PROJETO iOS CRIADO!"
 echo "═══════════════════════════════════════════════════════════════"
 echo ""
-echo "📂 APK: android/app/build/outputs/apk/debug/app-debug.apk"
-echo "📲 Instalar: adb install android/app/build/outputs/apk/debug/app-debug.apk"
+echo "📂 Projeto iOS: ios/App/App.xcworkspace"
+echo ""
+echo "🔨 Para build manual:"
+echo "   1. Abra ios/App/App.xcworkspace no Xcode"
+echo "   2. Selecione seu dispositivo/simulador"
+echo "   3. Clique em Product → Build"
+echo ""
+echo "   Ou use: npx cap open ios"
 echo ""
