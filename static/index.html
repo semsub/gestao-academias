@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JA Gestão Academias</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+background: linear-gradient(135deg, #0D47A1, #1E88E5);
+min-height: 100vh; display: flex; align-items: center; justify-content: center;
+color: white; }
+.container { text-align: center; padding: 2rem; }
+.logo { width: 150px; height: 150px; margin-bottom: 1.5rem; }
+h1 { font-size: 1.8rem; margin-bottom: 0.5rem; }
+p { opacity: 0.9; margin-bottom: 2rem; }
+.loading { width: 48px; height: 48px; border: 4px solid rgba(255,255,255,0.3);
+border-top-color: #fff; border-radius: 50%; margin: 0 auto 1.5rem;
+animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.btn { display: inline-block; background: #FF7A1A; color: white;
+padding: 12px 32px; border-radius: 8px; text-decoration: none;
+font-weight: 600; margin-top: 1rem; }
+</style>
+</head>
+<body>
+<div class="container">
+<img src="icon.svg" alt="JA Gestão" class="logo">
+<div class="loading"></div>
+<h1>JA Gestão Academias</h1>
+<p>Carregando sistema...</p>
+<a href="https://gestao-academias.onrender.com" class="btn">Acessar Sistema</a>
+</div>
+<script>
+setTimeout(function() { window.location.replace('https://gestao-academias.onrender.com'); }, 500);
+</script>
+</body>
+</html>

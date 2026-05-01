@@ -1,0 +1,19 @@
+{
+  "appId": "br.com.junioraraujo.gestaoacademias",
+  "appName": "JA Gestão Academias",
+  "webDir": "static",
+  "bundledWebRuntime": false,
+  "server": {
+    "url": "https://gestao-academias.onrender.com",
+    "cleartext": false
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 3000,
+      "launchAutoHide": true,
+      "backgroundColor": "#0D47A1",
+      "androidSplashResourceName": "splash",
+      "androidScaleType": "CENTER_CROP"
+    }
+  }
+}

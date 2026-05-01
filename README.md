@@ -71,6 +71,7 @@ python-app/
    ```bash
    pip install -r requirements.txt
    ```
+   > 🐉 **Kali Linux:** use `pip install --break-system-packages -r requirements.txt`
 
 4. **Configure o `.env`**
    ```bash
@@ -83,6 +84,22 @@ python-app/
    python app.py
    ```
    Acesse `http://localhost:5000`
+
+## 🐉 Kali Linux — APK Nativo
+
+Se você usa Kali Linux, temos scripts específicos que resolvem os erros de permissão:
+
+```bash
+cd python-app
+
+# Setup completo (instala tudo automaticamente)
+bash setup-kali.sh
+
+# Gerar APK
+bash build-apk.sh
+```
+
+Leia o guia completo: [`README-KALI.md`](README-KALI.md)
 
 ---
 
